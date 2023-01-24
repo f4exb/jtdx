@@ -213,6 +213,7 @@ private slots:
   void on_actionAcceptUDPCQ73_triggered();
   void on_actionAcceptUDPAny_triggered();
   void on_actionDisableTx73_toggled(bool checked);
+  void on_actionTxAfterQSO_toggled(bool checked);
   void on_actionShow_tooltips_main_window_toggled(bool checked);
   void on_actionColor_Tx_message_buttons_toggled(bool checked);
   void on_actionCallsign_to_clipboard_toggled(bool checked);
@@ -535,6 +536,8 @@ private:
   bool    m_agcc;
   bool    m_hint;
   bool    m_disable_TX_on_73;
+  bool    m_tx_after_qso;
+  bool    m_is_manual_tx;
   bool    m_showTooltips;
   bool    m_autoTx;
   bool    m_autoseq;

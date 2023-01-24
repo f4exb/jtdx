@@ -4821,6 +4821,7 @@ list. The list can be maintained in Settings (F2).</string>
     <addaction name="separator"/>
     <addaction name="menuAccept_UDP_Reply_messages"/>
     <addaction name="actionDisableTx73"/>
+	<addaction name="actionTxAfterQSO"/>
     <addaction name="separator"/>
     <addaction name="actionShow_tooltips_main_window"/>
     <addaction name="actionColor_Tx_message_buttons"/>
@@ -5874,6 +5875,14 @@ list. The list can be maintained in Settings (F2).</string>
    </property>
    <property name="text">
     <string>Disable TX after sending RRR/RR73/73 in manual mode</string>
+   </property>
+  </action>
+  <action name="actionTxAfterQSO">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Continue TXing after completed QSO</string>
    </property>
   </action>
   <action name="actionShow_tooltips_main_window">
