@@ -3,7 +3,9 @@
  * Created by Arvo ES1JA
  */
 
+#include <QDateTime>
 #include "qsohistory.h"
+
 void QsoHistory::init()
 {
     _data.clear();
@@ -736,5 +738,29 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
     }
       
 }     
-      
 
+void QsoHistory::next_call(QString& hisCall, QString& hisRpt, int& time)
+{
+  hisCall.clear();
+  hisRpt.clear();
+  time = -1;
+  if (_working)
+  {
+    for (auto qsoData : _data) {
+      if ((qsoData.status == 4) || (qsoData.status == 6)) {
+        QDateTime now = QDateTime::currentDateTimeUtc();
+        QDateTime startOfDay = QDateTime(now.date(), QTime(0, 0), Qt::UTC);
+        int currentSeconds = startOfDay.secsTo(now);
+        int deltaSeconds = currentSeconds - (int) qsoData.time;
+        if (deltaSeconds < 0)
+          deltaSeconds += 86400;
+        if (deltaSeconds < 300) { // Do not take calls older than 5 minutes
+          hisCall = qsoData.call;
+          hisRpt = qsoData.s_rep;
+          time = deltaSeconds;
+          break;
+        }
+      }
+    }
+  }
+}

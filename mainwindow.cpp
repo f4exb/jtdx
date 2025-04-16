@@ -2027,6 +2027,16 @@ void MainWindow::autoStopTx(QString reason)
     else
     {
       writeHaltTxEvent("Would have stopped TX for reason: " + reason);
+      printf("autoStopTx: Would have stopped TX for reason: %s\n", reason.toStdString().c_str());
+      m_qsoHistory.remove(m_hisCall);  
+      int callTime;
+      m_qsoHistory.next_call(m_hisCall, m_rpt, callTime);
+      if (m_config.write_decoded_debug()) {
+        writeToALLTXT(QString("autoStopTx: next_call %1 (%2) %3s ago").arg(m_hisCall).arg(m_rpt).arg(callTime));
+      }
+      printf("autoStopTx: next_call %s (%s) %ds ago\n", m_hisCall.toStdString().c_str(), m_rpt.toStdString().c_str(), callTime);
+      genStdMsgs(m_rpt);
+      process_Auto();
     }
     m_is_manual_tx = false;
   }
@@ -2034,7 +2044,7 @@ void MainWindow::autoStopTx(QString reason)
   if (m_skipTx1 && reason.endsWith("counter triggered ") && (m_ntx == 2 || m_QSOProgress == REPORT))
     m_qsoHistory.remove(m_hisCall);
   // prevent AF RX frequency jumps since QSO is finished and prevent unexpected Halt Tx in autologging mode
-  if ((m_config.clear_DX() || m_config.autolog()) && !m_hisCall.isEmpty() && !m_houndMode)
+  if ((m_config.clear_DX() || m_config.autolog()) && !m_hisCall.isEmpty() && !m_houndMode && !m_tx_after_qso)
     clearDX(" cleared from autoStopTx()");
 }
 
@@ -4483,7 +4493,7 @@ void MainWindow::process_Auto()
         if (m_status > QsoHistory::RREPORT)
           StrPriority += " Resume interrupted QSO ";
       }
-      writeToALLTXT("hisCall:" + hisCall + "mode:" + mode + StrPriority + " time:" + QString::number(time) + " autoselect: " + StrDirection + " status: " + StrStatus[m_status] + " count: " + QString::number(count) + " prio: " + QString::number(prio));
+      writeToALLTXT("hisCall:" + hisCall + " mode:" + mode + StrPriority + " time:" + QString::number(time) + " autoselect: " + StrDirection + " status: " + StrStatus[m_status] + " count: " + QString::number(count) + " prio: " + QString::number(prio));
     }
     if (!hisCall.isEmpty())
     {
@@ -4510,7 +4520,22 @@ void MainWindow::process_Auto()
         ui->genMsg->setText(ui->tx6->text());
     }
   }
-  //  printf("%s(%0.1f) process_Auto: %s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),m_jtdxtime->GetOffset(),m_hisCall.toStdString().c_str(),hisCall.toStdString().c_str(),m_lastloggedcall.toStdString().c_str(),mode.toStdString().c_str(),m_status,prio,ui->TxFreqSpinBox->value (),m_used_freq,m_callMode,m_callPrioCQ,m_reply_other,m_reply_me,counters2);
+  printf("%s(%0.1f) process_Auto: %s,%s,%s,%s,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",\
+    m_jtdxtime->currentDateTimeUtc2().toString("hh:mm:ss.zzz").toStdString().c_str(),
+    m_jtdxtime->GetOffset(),
+    m_hisCall.toStdString().c_str(),
+    hisCall.toStdString().c_str(),
+    m_lastloggedcall.toStdString().c_str(),
+    mode.toStdString().c_str(),
+    m_status,
+    prio,
+    ui->TxFreqSpinBox->value (),
+    m_used_freq,
+    m_callMode,
+    m_callPrioCQ,
+    m_reply_other,
+    m_reply_me,counters2
+  );
 
   if (rx > 0 && rx != ui->RxFreqSpinBox->value())
     ui->RxFreqSpinBox->setValue(rx);
@@ -6870,7 +6895,7 @@ void MainWindow::processMessage(QString const &messages, int position, bool alt,
   }
   if (alt && m_enableTx)
     haltTx("TX halted: ALT modifier is used at double click on message ");
-  m_is_manual_tx = true;
+  // m_is_manual_tx = true;
   if (m_config.write_decoded_debug())
   {
     QString EnTXstate = m_enableTx ? "On" : "OFF";

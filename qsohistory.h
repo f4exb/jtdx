@@ -31,6 +31,7 @@ class QsoHistory
 	int blacklist(QString const& callsign);
 	void calllist(QString const& callsign,int level, unsigned time);
 	int reset_count(QString const& callsign,Status status = NONE);
+	void next_call(QString& hisCall, QString& hisRpt, int& time);
 	JTDXDateTime * jtdxtime;
  private:
  	QRegularExpression _gridRe = QRegularExpression("^[A-R]{2,2}[0-9]{2,2}[A-R]{0,2}[0-9]{0,2}[A-R]{0,2}");
